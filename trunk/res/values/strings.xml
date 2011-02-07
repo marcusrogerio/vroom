@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- App Information -->
+    <string name="app_name">Vroom!</string>
+    
+    <!-- Main Menu Button Information -->
+    <string name="engine_monitor_button_txt">monitor</string>
+    <string name="repair_button_txt">repair</string>
+    <string name="upload_button_txt">upload</string>
+    <string name="settings_button_txt">settings</string>
+    <string name="exit_button_txt">exit</string>
+    
+    <!-- Settings Menu Information -->
+    <string name="settings_label">settings</string>
+    <string name="settings_shortcut">s</string>
+</resources>
