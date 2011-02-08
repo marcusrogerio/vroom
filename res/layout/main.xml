@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Start Main Layout -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -6,21 +7,23 @@
     android:background="@color/background"
     android:padding="10dip"
     >
-    <!-- Heading -->
+    <!-- Start Heading -->
 	<TextView 
 		android:id="@+id/header_text" 
     	android:layout_width="fill_parent" 
     	android:layout_height="wrap_content" 
     	android:text="@string/app_name">
     </TextView>
+    <!-- End Heading -->
     
-    <!-- Buttons -->
+    <!-- Start Buttons Table -->
     <TableLayout android:layout_height="fill_parent"
     			android:layout_width="fill_parent" 
     			android:id="@+id/button_layout" 
     			android:stretchColumns="1"
     			android:padding="15dip">
-    			
+    	
+    	<!-- Begin First Row of Buttons -->		
         <TableRow>
         			
             <Button 
@@ -42,6 +45,8 @@
             		android:height="60dip"
             		android:textSize="16sp"></Button>
         </TableRow>
+        <!-- End First Row of Buttons -->
+        <!-- Start Second Row of Buttons -->
         <TableRow>
         			
             <Button 
@@ -81,5 +86,8 @@
         			android:height="40dip"
         			android:textSize="16sp"></Button>
         </TableRow>
+        <!-- End Second Row of Buttons -->
     </TableLayout>
+    <!-- End Button Table -->
 </LinearLayout>
+<!-- End Main Layout -->

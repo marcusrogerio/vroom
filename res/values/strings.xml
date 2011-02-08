@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- App Information -->
+	<!-- Start App Information -->
     <string name="app_name">Vroom!</string>
+    <!-- End App Information -->
     
-    <!-- Main Menu Button Information -->
+    <!-- Start Vroom Information -->
     <string name="engine_monitor_button_txt">monitor</string>
     <string name="repair_button_txt">repair</string>
     <string name="upload_button_txt">upload</string>
     <string name="settings_button_txt">settings</string>
     <string name="exit_button_txt">exit</string>
+   <!-- End Main Menu Button Information -->
+   
+   <!-- Start Monitor Information -->
+    <string name="monitor_title">Engine Monitor</string>
+    <!-- End Monitor Information -->
     
-    <!-- Settings Menu Information -->
+    <!-- Start Repair Information -->
+    <string name="repair_title">Repair Helper</string>
+    <!-- End Repair Information -->
+    
+    <!-- Start Settings Information -->
+    <string name="settings_title">Program Settings</string>
     <string name="settings_label">settings</string>
     <string name="settings_shortcut">s</string>
+    <!-- End Settings Menu Information -->
+    
+    <!-- Start Upload Information -->
+    <string name="upload_title">Upload Vehicle Data</string>
+    <!-- End Upload Information -->
 </resources>
