@@ -3,15 +3,41 @@
       package="com.vroom"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="2" />
+    <uses-sdk android:minSdkVersion="8" />
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:restoreNeedsApplication="false" android:allowBackup="false" android:killAfterRestore="false" android:restoreAnyVersion="false">
-        <activity android:name=".Vroom"
-                  android:label="@string/app_name">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    
+    	<!-- Start Main Activity -->
+        <activity 	android:name=".Vroom"
+                  	android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action 	android:name="android.intent.action.MAIN" />
+                <category 	android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <!-- End Main Activity -->
+        
+        <!-- Start Monitor Activity -->
+        <activity	android:name=".Monitor"
+        			android:label="@string/monitor_title">
+        </activity>
+        <!-- End Monitor Activity -->
+        
+        <!-- Start Repair Activity -->
+        <activity 	android:name=".Repair"
+        			android:label="@string/repair_title">
+        </activity>
+        <!-- End Repair Activity -->
+        
+        <!-- Start Settings Activity -->
+        <activity 	android:name=".Settings"
+        			android:label="@string/settings_title">
+        </activity>
+        <!-- End Settings Activity -->
+        
+        <!-- Start Upload Activity -->
+        <activity 	android:name=".Upload"
+        			android:label="@string/upload_title">
         </activity>
 
     </application>
