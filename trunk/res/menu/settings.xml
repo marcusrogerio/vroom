@@ -3,6 +3,9 @@
 	<item 	android:id="@+id/settings"
 			android:title="@string/settings_label"
 			android:alphabeticShortcut="@string/settings_label"></item>
+			
+	<item	android:id="@+id/thin"
+			android:title="Thing"></item>
 </menu>
     
     
