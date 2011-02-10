@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import java.lang.Exception;
 
@@ -58,6 +59,9 @@ public class Vroom extends Activity implements OnClickListener{
     		Log.v(TAG, "Crating main layout");
             super.onCreate(savedInstanceState);
             
+            //Set the content view
+            setContentView(R.layout.main);
+        
             /*
              * Check to see if the device has Bluetooth
              * If it does, create the connection and generate all the buttons
@@ -69,9 +73,6 @@ public class Vroom extends Activity implements OnClickListener{
             //Start if/else
             if (mBluetoothAdapter != null) {
             	Log.v(TAG, "Bluetooth availiable, building all buttons");
-            	
-            	//Set normal content view
-                setContentView(R.layout.main);
             	
                 //Set up click listeners for all the buttons
                 View engineMonitorButton = findViewById(R.id.engine_monitor_button);
@@ -89,8 +90,9 @@ public class Vroom extends Activity implements OnClickListener{
             else
             {
             	Log.e(TAG, "Bluetooth not availiable! Loading reserve buttons");
-            	//Set normal content view
-                setContentView(R.layout.main_bluetooth);
+            	
+            	//Alert the user that Bluetooth isn't available
+            	Toast.makeText(getApplicationContext(), "Bluetooth not enabled. Major functionality will be lost.", Toast.LENGTH_LONG).show();
                 
                 //Add click listeners for the remaining buttons
             	View uploadButton = findViewById(R.id.upload_button);
@@ -219,6 +221,7 @@ public class Vroom extends Activity implements OnClickListener{
 	 * 	@throws none
 	 * 
 	 **/
+    //Start onOptionsItemSelected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	try {
@@ -242,4 +245,5 @@ public class Vroom extends Activity implements OnClickListener{
     	}
   
     }
+    //End onOptionsItemSelected
 }

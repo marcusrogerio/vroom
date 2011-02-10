@@ -3,6 +3,13 @@
 
 <!-- Main Background Color -->
     <color name="background">#ffffffff</color>
+    <color name="text">#00000000</color>
+
+
+<!-- Alert colors -->
+	<color name="alertGreen">#66CD00</color>
+	<color name="alertYellow">#FCD116</color>
+	<color name="alertRed">#FF3300</color>
     
     
 </resources>
