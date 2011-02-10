@@ -19,7 +19,7 @@ import java.lang.Exception;
  * the buttons accordingly. 
  * 
  * @author Neale Petrillo
- * @version 1
+ * @version 1 2/9/2011
  **/
 public class Vroom extends Activity implements OnClickListener{
 	
@@ -29,7 +29,7 @@ public class Vroom extends Activity implements OnClickListener{
 	 * @see Vroom
 	 * @see onCreate
 	 */
-	private final  String TAG = "Vroom";
+	private static final  String TAG = "Vroom";
 	
 	/**
 	 * Vroom class constructor
@@ -223,9 +223,13 @@ public class Vroom extends Activity implements OnClickListener{
     public boolean onOptionsItemSelected(MenuItem item) {
     	try {
     	  	switch (item.getItemId()) {
-        	case R.id.settings:
-        		startActivity(new Intent(this, Settings.class));
+        	case R.id.personal_settings:
+        		startActivity(new Intent(this, PersonalSettings.class));
         		return true;
+        		
+        	case R.id.device_settings:
+    			startActivity(new Intent(this, DeviceSettings.class));
+    			return true;
         		
         	default:
         		Log.v(TAG, "Menu item selected was not found in the onOptionsItemsSelected method. Returning false");
