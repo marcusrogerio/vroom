@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+	This document outlines the various personal settings to be displayed under the options menu for Vroom and is 
+	the companion document to the PersonalSettings class.
+	
+	@author Neale Petrillo
+	@version 1.0, 2/9/2011
+	
+	@see DeviceSettings.java
+ -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference	android:key="personal_key"
+                		android:title="@string/personal_settings_key_title"
+                		android:summary="@string/personal_settings_key_description"
+                		android:defaultValue=""></EditTextPreference>
+
+</PreferenceScreen>

@@ -34,9 +34,11 @@
         <!-- End Repair Activity -->
         
         <!-- Start Settings Activity -->
-        <activity 	android:name=".Settings"
-        			android:label="@string/settings_title">
+        <activity 	android:name=".PersonalSettings"
+        			android:label="@string/personal_settings_title">
         </activity>
+        <activity	android:name=".DeviceSettings"
+        			android:label="@string/device_settings_title"></activity>
         <!-- End Settings Activity -->
         
         <!-- Start Upload Activity -->

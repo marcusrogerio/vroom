@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+	This document outlines the various device settings to be displayed under the options menu for Vroom and is 
+	the companion document to the DeviceSettings class.
+	
+	@author Neale Petrillo
+	@version 1.0 2/9/2011
+	
+	@see DeviceSettings.java
+
+ -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference	android:key="device_mac"
+                		android:title="@string/device_settings_mac_title"
+                		android:summary="@string/device_settings_mac_description"
+                		android:defaultValue=""></EditTextPreference>
+                		
+    <CheckBoxPreference	android:key="device_connect"
+    					android:title="@string/device_settings_connect_title"
+    					android:summary="@string/device_settings_connect_description"
+    					android:defaultValue="true"></CheckBoxPreference>
+</PreferenceScreen>
