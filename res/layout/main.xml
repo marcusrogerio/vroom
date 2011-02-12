@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+	This file defines the main portrait layout for the Vroom class. The horizontal layout can be found in res/layout-land/main.xml. 
+	In this file a row of buttons for various libraries is loaded followed by a row of captions describing the buttons. 
+	A text header sits on top of all. 
+ -->
 <!-- Start Main Layout -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -13,7 +18,9 @@
     	android:layout_width="fill_parent" 
     	android:layout_height="wrap_content" 
     	android:text="@string/app_name"
-    	android:textColor="@color/alertGreen">
+    	android:textColor="@color/textGreen"
+    	android:textSize="50sp"
+    	android:gravity="center">
     </TextView>
     <!-- End Heading -->
     
@@ -22,72 +29,93 @@
     			android:layout_width="fill_parent" 
     			android:id="@+id/button_layout" 
     			android:stretchColumns="1"
-    			android:padding="15dip">
-    	
-    	<!-- Begin First Row of Buttons -->		
-        <TableRow>
+    			android:padding="15dip"
+    			android:layout_margin="0dip">
+    			
+    	<!-- Begin First Row of Buttons -->
+    	<TableRow	android:layout_marginBottom="0dip">
+    		<Button
+    			android:id="@+id/engine_monitor_button"
+    			android:layout_width="64px"
+    			android:layout_height="64px"
+    			android:background="@drawable/monitor"
+    			android:gravity="center"></Button>
+    			
+    		<Button
+    			android:visibility="invisible"/>
+    			
+    		<Button
+    			android:id="@+id/repair_button"
+    			android:layout_width="64px"
+    			android:layout_height="64px"
+    			android:background="@drawable/repair"
+    			android:gravity="center"></Button>
+    	</TableRow>
+    	<!-- End First Row of Buttons -->
+    	<!-- Begin First Row of Text -->		
+        <TableRow 	android:layout_marginBottom="30dip">
         			
-            <Button 
-            		android:background="@drawable/monitor" 
-            		android:id="@+id/engine_monitor_button"
+            <TextView
+            		android:id="@+id/engine_monitor_text"
             		android:text="@string/engine_monitor_button_txt" 
-            		android:width="60dip"
-            		android:height="60dip"
-            		android:textSize="16sp"></Button>
+            		android:textSize="20sp"
+            		android:textColor="@color/textGray"
+            		android:gravity="center"></TextView>
              		
              <!-- Invisible spacer button -->
-   			<Button
+   			<TextView
 		            android:visibility="invisible"/>
 	            
-            <Button android:id="@+id/repair_button"  
-            		android:background="@drawable/repair" 
+            <TextView android:id="@+id/repair_button"  
             		android:text="@string/repair_button_txt"
-            		android:width="60dip"
-            		android:height="60dip"
-            		android:textSize="16sp"></Button>
+            		android:textSize="20sp"
+            		android:textColor="@color/textGray"
+            		android:gravity="center"></TextView>
         </TableRow>
-        <!-- End First Row of Buttons -->
+        <!-- End First Row of Text -->
         <!-- Start Second Row of Buttons -->
         <TableRow>
+    		<Button
+    			android:id="@+id/upload_button"
+    			android:layout_width="64px"
+    			android:layout_height="64px"
+    			android:background="@drawable/upload"
+    			android:gravity="center"></Button>
+    			
+    		<Button
+    			android:visibility="invisible"/>
+    			
+    		<Button
+    			android:id="@+id/exit_button"
+    			android:layout_width="64px"
+    			android:layout_height="64px"
+    			android:background="@drawable/exit"
+    			android:gravity="center"></Button>        	
+        </TableRow>
+        <!-- End Second Row of Buttons -->
+        <!-- Start Second Row of Text -->
+        <TableRow>
         			
-            <Button 
-            		android:background="@drawable/upload" 
+            <TextView 
             		android:id="@+id/upload_button" 
             		android:text="@string/upload_button_txt"
-            		android:width="60dip"
-            		android:height="60dip"
-            		android:textSize="16sp"></Button>
+            		android:textSize="20sp"
+            		android:textColor="@color/textGray"
+            		android:gravity="center"></TextView>
              
              <!-- Invisible spacer button -->              		
-   			<Button
+   			<TextView
 
 		            android:visibility="invisible"/>  
 		                     		
-            <Button 
-            		android:background="@drawable/settings" 
-            		android:id="@+id/settings_button"
-            		android:text="@string/settings_button_txt"
-            		android:width="60dip"
-            		android:height="60dip"
-            		android:textSize="16sp"></Button>
-        </TableRow>
-        <TableRow>
-            <!-- Invisible spacer button -->              		
-   			<Button
-
-		            android:visibility="invisible"/>
-   			<Button
-
-		            android:visibility="invisible"/>  
-        	<Button	
-        			android:background="@drawable/exit"
+        	<TextView	
         			android:id="@+id/exit_button"
         			android:text="@string/exit_button_txt"
-        			android:width="40dip"
-        			android:height="40dip"
-        			android:textSize="16sp"></Button>
+        			android:textSize="20sp"
+        			android:textColor="@color/textGray"
+        			android:gravity="center"></TextView>
         </TableRow>
-        <!-- End Second Row of Buttons -->
+        <!-- End Second Row of Text -->
     </TableLayout>
     <!-- End Button Table -->
 </LinearLayout>
