@@ -2,14 +2,19 @@
 <resources>
 
 <!-- Main Background Color -->
-    <color name="background">#ffffffff</color>
-    <color name="text">#00000000</color>
+    <color name="background">#FFFFFF</color>
+    
+<!-- Main Text Colors -->
+	<color name="textGreen">#AACC33</color>
+	<color name="textGray">#404040</color>
 
 
-<!-- Alert colors -->
+<!-- Alert Text Colors -->
 	<color name="alertGreen">#66CD00</color>
 	<color name="alertYellow">#FCD116</color>
 	<color name="alertRed">#FF3300</color>
-    
+
+<!-- Button Background Colors -->
+	<color name="buttonBackground">#DDDDDD</color>
     
 </resources>
