@@ -54,7 +54,7 @@ public class Vroom extends Activity implements OnClickListener{
 	//Start onCreate
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	//start try/catch	
+    	//Start try/catch	
     	try {
     		Log.v(TAG, "Crating main layout");
             super.onCreate(savedInstanceState);
