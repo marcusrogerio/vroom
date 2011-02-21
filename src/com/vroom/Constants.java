@@ -65,6 +65,10 @@ public interface Constants extends BaseColumns {
 	public static final String temperature = "temperature";
 	
 	public static final String timestamp = "timestamp";
+	
+	public static final String rpm = "rpm";
+	
+	public static final String troubleCode = "troubleCode";
 //End userHistory table
 	
 	
