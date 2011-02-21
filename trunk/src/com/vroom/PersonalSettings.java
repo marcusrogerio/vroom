@@ -77,7 +77,7 @@ public class PersonalSettings extends PreferenceActivity {
 	 * 
 	 * @param context The context in which we're working, type Context
 	 * @return key The program's key, type String
-	 * @throws none
+	 * @throws none This method throws no errors.
 	 */
 	//Start getKey
 	public static String getKey(Context context){
