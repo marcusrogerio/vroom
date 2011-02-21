@@ -87,7 +87,7 @@ public class DeviceSettings extends PreferenceActivity {
 	 * 
 	 * @param context The context in which we're working, type Context
 	 * @return String containing the MAC stored address
-	 * @throws none 
+	 * @throws none This method throws no errors
 	 */
 	//Start getDeviceMac()
 	public static String getDeviceMac(Context context){
@@ -110,7 +110,7 @@ public class DeviceSettings extends PreferenceActivity {
 	 * 
 	 * @param context The context in which we're working, type Context
 	 * @return true if the user wants to automatically connect or false otherwise (or on failure)
-	 * @throws none
+	 * @throws none This method throws no errors.
 	 */
 	//Start getConnect()
 	public static boolean getConnect(Context context){
