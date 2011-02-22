@@ -76,11 +76,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	db.execSQL("CREATE TABLE " + TABLE_USERHISTORY + " ("
     			+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
     			+ historyId + " TEXT, "
-    			+ voltage + " DECIMAL(4), "
+    			+ voltage + " FLOAT, "
     			+ temperature + " INTEGER, "
     			+ rpm + " INTEGER, "
     			+ troubleCode + " TEXT, "
-    			+ timestamp + " STRFTIME);");
+    			+ timestamp + " TIMESTAMP DEFAULT NOT NULL current_timestamp);");
     	
     	//Create the USERVEHICLES table
     	db.execSQL("CREATE TABLE " + TABLE_USERVEHICLES + " ("
@@ -112,7 +112,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * UpdateHistory updates one row of the history table. 
      * 
      * The UpdateHistory function is designed to take any number of arguments and update a history row as needed. 
-     * Any passed values that are not in use must be given a null value. 
+     * Any passed values that are not in use must be given a null value. The timestamp column is omitted because
+     * SQLite automatically updates it.
      * 
      * @author Neale Petrillo
      * @version 1, 2/21/2011
