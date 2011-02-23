@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 public class Monitor extends Activity {
 
@@ -25,42 +24,12 @@ public class Monitor extends Activity {
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+	    
+	    //Setup the views
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.monitor);
 		
 		history = new DatabaseHelper(this);
-		
-		//Tests
-		Byte fFink = (0x0000);
-		updateHistory("1234", 45, 4500, 4.8, fFink);
-		Cursor thing = getHistory("1234");
-		Log.v(TAG, "Got the query, starting to build the string");
-		
-		StringBuilder builder = new StringBuilder("Saved data:\n");
-		
-		Log.v(TAG, "Got the string, adding stuff");
-		
-		while(thing.moveToNext()){
-		    Log.v(TAG, "Adding stuff to the string");
-		
-		    //_ID, temperature, rpm, voltage, troubleCode, historyId, timestamp
-		    long id = thing.getLong(0);
-		    int temp = thing.getInt(1);
-		    int rpm = thing.getInt(2);
-		    double volt = thing.getDouble(3);
-		    String carId = thing.getString(4);
-		    String time = thing.getString(5);
-		    
-		    builder.append(id).append("::");
-		    builder.append(temp).append("::");
-		    builder.append(rpm).append("::");
-		    builder.append(volt).append("::");
-		    builder.append(carId).append("::");
-		    builder.append(time).append("::");
-		}
-		Log.v(TAG,"Printing the string");
-		TextView text = (TextView) findViewById(R.id.monitorTest);
-		text.setText(builder);
 		
 	}
 	
@@ -113,61 +82,31 @@ public class Monitor extends Activity {
 		    db.close();
 		}
 	    }
+	
 	    
-	    private Cursor getHistory(String vehicleId){
-		
-		//Open the database
-		Log.v(TAG, "Getting the readable database");
-		SQLiteDatabase db = history.getReadableDatabase();
-		
-		try{
-			final String[] FROM = {_ID, temperature, rpm, voltage, troubleCode, historyId, timestamp,};
-			final String ORDER_BY = timestamp + " DESC";
-			
-			Log.v(TAG, "Running the Query");
-			//Perform a managed query. The Activity will handle closing and re-querying the cursor when needed.
-			Cursor cursor = db.query(TABLE_USERHISTORY, FROM, historyId + " = '"+vehicleId+"'", null, null, null, ORDER_BY);
-			startManagingCursor(cursor);
-			Log.v(TAG, "Returning the query");
-			return cursor;     
-		}
-		finally {
-		    db.close();
-		}
-	    }
+	    
 	    
 	    /**
-	     * getLatest gets the last stored data for the specified field.
+	     * getHistory retrieves the entire history stored in memory.
 	     * 
-	     * getLatest returns a string or null if the field is not found or if there is no data. 
+	     * The returned cursor is ordered according to the recorded timestamp (most recent items first).
 	     * 
 	     * @author Neale Petrillo
-	     * @version 1 2/22/2011
+	     * @version 1, 2/23/2011
 	     * 
-	     * @param field the name of a field in the userhistory table.
-	     * @param vehicleId the vehicle id for looking up
-	     * @return string containing the latest entry for the field or null on error or no data found. 
+	     * @param vehicleId The id of the vehicle to be looked up
+	     * @return A cursor with the database query results. There is no limit on the returned size.
 	     */
-	    private String getLatest(String field, String vehicleId){
-		//Open the database
-		SQLiteDatabase db = history.getReadableDatabase();
+	    private Cursor getHistory(String vehicleId){
 		
-		try{
-			final String[] FROM = {field,timestamp,};
-			final String ORDER_BY = timestamp + " DESC";
-			
-			//Perform a managed query. The Activity will handle closing and re-querying the cursor when needed.
-			Cursor cursor = db.query(TABLE_USERHISTORY, FROM, historyId + " = '" + vehicleId + "'", null, null, null, ORDER_BY, "1");
-			startManagingCursor(cursor);
-			
-			//Get the single element from the cursor and convert it to a string then return it
-			return cursor.getString(0);     
-		}
-		finally {
-		    db.close();
-		}
-	    }
-	    
-	    
-	    
+		final String[] FROM = {_ID, historyId, rpm, temperature, troubleCode, voltage,timestamp,};
+		final String ORDER_BY = timestamp + " DESC";
+		
+		
+		SQLiteDatabase db = history.getReadableDatabase();
+		Cursor cursor = db.query(TABLE_USERHISTORY, FROM, historyId + "=" + vehicleId, null, null, null, ORDER_BY);
+		startManagingCursor(cursor);
+		return cursor;
+
+	    }	    
 }
