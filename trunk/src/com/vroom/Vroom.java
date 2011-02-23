@@ -100,6 +100,10 @@ public class Vroom extends Activity implements OnClickListener{
                 
                 View exitButton = findViewById(R.id.exit_button);
                 exitButton.setOnClickListener(this);
+                
+                //Will be removed later
+                View engineMonitorButton = findViewById(R.id.engine_monitor_button);
+                engineMonitorButton.setOnClickListener(this);
             }
             //End if/else
     
