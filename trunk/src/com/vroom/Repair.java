@@ -10,4 +10,7 @@ public class Repair extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.repair);
 	}
+	
+	
+	
 }

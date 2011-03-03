@@ -22,6 +22,19 @@ public class Monitor extends Activity {
     private final String TAG = "Monitor";
     private DatabaseHelper history;
     
+    /**
+     * onCreate is called when the class is first created.
+     * It sets the content view, prepares the database, builds the bluetooth helper, and sets up graphing. 
+     * 
+     * @author Neale Petrillo
+     * @version 1, 3/3/2011
+     * 
+     * @see DatabaseHelper
+     * @see Monitor
+     * @see BluetoothHelper
+     * 
+     * @throws none
+     */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    
@@ -30,7 +43,6 @@ public class Monitor extends Activity {
 		setContentView(R.layout.monitor);
 		
 		history = new DatabaseHelper(this);
-		
 	}
 	
 
