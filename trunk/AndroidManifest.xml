@@ -7,6 +7,7 @@
     			android:targetSdkVersion="8"/>
     
     <!-- Ask for Permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 	<!-- End Permissions -->
 	
@@ -45,6 +46,12 @@
         <!-- Start Upload Activity -->
         <activity 	android:name=".Upload"
         			android:label="@string/upload_title">
+        </activity>
+        <!-- End Upload Activity -->
+        
+        <!-- Start Discovery Activity -->
+        <activity android:name=".DeviceListActivity"
+        			android:label="@string/deviceActivityTitle">
         </activity>
 
     </application>

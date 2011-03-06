@@ -9,19 +9,26 @@ import static com.vroom.Constants.troubleCode;
 import static com.vroom.Constants.voltage;
 import static com.vroom.Constants.timestamp;
 
+import com.vroom.BluetoothHelper;
+import com.vroom.BluetoothHandler;
+
 import com.vroom.DatabaseHelper;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 
-public class Monitor extends Activity {
+public class Monitor extends Activity implements OnClickListener{
 
     private final String TAG = "Monitor";
     private DatabaseHelper history;
-    
+    private BluetoothHandler handler;
+    private BluetoothHelper device;
     /**
      * onCreate is called when the class is first created.
      * It sets the content view, prepares the database, builds the bluetooth helper, and sets up graphing. 
@@ -43,6 +50,14 @@ public class Monitor extends Activity {
 		setContentView(R.layout.monitor);
 		
 		history = new DatabaseHelper(this);
+		
+		handler = new BluetoothHandler();
+		device = new BluetoothHelper(this, handler);
+		
+		//Set onClickListener for connect button
+                View connectButton = findViewById(R.id.connect_button);
+                connectButton.setOnClickListener(this);
+	
 	}
 	
 
@@ -120,5 +135,40 @@ public class Monitor extends Activity {
 		startManagingCursor(cursor);
 		return cursor;
 
+	    }
+
+	    /**
+	     * Method called when the connection manager button is pressed.
+	     *<p>
+	     *Starts the DeviceListActivity activity and begins the process of connecting to a Bluetooth device. 
+	     *
+	     *@author Neale Petrillo
+	     *@version 1
+	     *
+	     *@param view The View that has been clicked.
+	     */
+	    @Override
+	    public void onClick(View v) {
+	    	try {
+	        	Log.v(TAG,"Connect Button Pressed");
+	        	
+	        	//Look for v's id in the list of known buttons. Issue an error message if you can't find it.
+	        	switch (v.getId()) {
+	        	case R.id.connect_button:
+	        		Log.v(TAG,"Connect Button pressed. Calling DeviceListActivity.java");
+	        		Intent i = new Intent(this, DeviceListActivity.class);
+	        		startActivity(i);
+	        		break;
+	        	default:
+	        		Log.e(TAG,"No button found with " + v.getId());
+	        	
+	        	}
+	        	//End Switch
+	    		
+	    	}
+	    	catch (Exception e){
+	    		Log.e(TAG,"There was an exception with the onClick function: " + e.getMessage(),e.getCause());
+	    	}
+	    	//End try/catch
 	    }	    
 }

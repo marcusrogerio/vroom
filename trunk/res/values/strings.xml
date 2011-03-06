@@ -53,5 +53,7 @@
 	    <string name="scanning">Scanning for devices...</string>
 	    <string name="select_device">Select A Device</string>
 	    <string name="none_found">No Bluetooth devices were found.</string>
+	    <string name="connectButtonText">Connect to Device</string>
+	    <string name="deviceActivityTitle">Connect To Device</string>
 	    <!-- End Bluetooth Strings -->
 </resources>
