@@ -44,4 +44,14 @@
 	    <!-- Start Upload Information -->
 	    <string name="upload_title">Upload Vehicle Data</string>
 	    <!-- End Upload Information -->
+	    
+	    <!-- Start Bluetooth Strings -->
+	    <string name="button_scan">Scan</string>
+	    <string name="title_other_devices">Other Devices</string>
+	    <string name="title_paired_devices">Paired Devices</string>
+	    <string name="none_paired">No paired devices found.</string>
+	    <string name="scanning">Scanning for devices...</string>
+	    <string name="select_device">Select A Device</string>
+	    <string name="none_found">No Bluetooth devices were found.</string>
+	    <!-- End Bluetooth Strings -->
 </resources>
