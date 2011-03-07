@@ -15,6 +15,9 @@ import static com.vroom.Constants.timestamp;
 
 import static com.vroom.Constants.TABLE_USERVEHICLES;
 import static com.vroom.Constants.vehicleId;
+import static com.vroom.Constants.vehicleMake;
+import static com.vroom.Constants.vehicleModel;
+import static com.vroom.Constants.vehicleYear;
 
 import static android.provider.BaseColumns._ID;
 
@@ -36,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
     	private static final String TAG = "DatabaseHelper";
 	private static final String DATABASE_NAME = "vroomInfo.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	/**
 	 * Constructor for DatabaseHelper
@@ -95,7 +98,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	    	//Create the USERVEHICLES table
 	    	db.execSQL("CREATE TABLE " + TABLE_USERVEHICLES + " ("
 	    			+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-	    			+ vehicleId + " VARCHAR(45));");
+	    			+ vehicleId + " VARCHAR(45), " 
+	    			+ vehicleMake + " VARCHAR(45), "
+	    			+ vehicleModel + " VARCHAR(45), "
+	    			+ vehicleYear + " INT(4));");
 	}
 	catch(Exception e){
 	    Log.e(TAG, "Unable to create tables. "+e.getMessage(), e.getCause());
