@@ -3,7 +3,8 @@ package com.vroom;
 import android.provider.BaseColumns;
 
 public interface Constants extends BaseColumns {
-	
+//Start local database columns
+    
 //Start userCodes table	
 	/**
 	 * This defines the name of the table containing the list of codes specific to the user defined vehicles.
@@ -48,6 +49,30 @@ public interface Constants extends BaseColumns {
 	 * @version 1, 2/20/0211
 	 */
 	public static final String vehicleId = "identifier";
+	
+	/**
+	 * Defines the name of the vehicle model column
+	 * 
+	 * @author Neale Petrillo
+	 * @version 1, 3/6/2011
+	 */
+	public static final String vehicleModel = "model";
+	
+	/**
+	 * Defines the name of the vehicle make column
+	 * 
+	 * @author Neale Petrillo
+	 * @version 1, 3/6/2011
+	 */
+	public static final String vehicleMake = "make";
+	
+	/**
+	 * Defines the name of the vehicle year column
+	 * 
+	 * @author Neale Petrillo
+	 * @version 1, 3/6/2011
+	 */
+	public static final String vehicleYear = "year";
 //End userVehicles table
 //Start userHistory table	
 	/**
@@ -70,7 +95,14 @@ public interface Constants extends BaseColumns {
 	
 	public static final String troubleCode = "troubleCode";
 //End userHistory table
+
+//Start external database information 
+	public static final String getErrorInfoURL = "http://eclipse.wells.edu/~npetrillo/thesis/returnErrors.php";
+//End external database information
 	
+//Start activity list data
+	public static final int DEVICE_LIST_ACTIVITY_ID = 000001;
+//End activity list data
 	
 	
 }

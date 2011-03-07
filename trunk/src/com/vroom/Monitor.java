@@ -8,12 +8,15 @@ import static com.vroom.Constants.temperature;
 import static com.vroom.Constants.troubleCode;
 import static com.vroom.Constants.voltage;
 import static com.vroom.Constants.timestamp;
+import static com.vroom.Constants.DEVICE_LIST_ACTIVITY_ID;
 
 import com.vroom.BluetoothHelper;
 import com.vroom.BluetoothHandler;
 
 import com.vroom.DatabaseHelper;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -45,12 +48,12 @@ public class Monitor extends Activity implements OnClickListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    
-	    //Setup the views
+	    	//Setup the views
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.monitor);
 		
+		//Setup local variables
 		history = new DatabaseHelper(this);
-		
 		handler = new BluetoothHandler();
 		device = new BluetoothHelper(this, handler);
 		
@@ -59,7 +62,7 @@ public class Monitor extends Activity implements OnClickListener{
                 connectButton.setOnClickListener(this);
 	
 	}
-	
+	//End onCreate
 
 	    /**
 	     * UpdateHistory updates one row of the history table. 
@@ -108,8 +111,9 @@ public class Monitor extends Activity implements OnClickListener{
 		}finally {
 		    db.close();
 		}
+		//End try/catch/finally
 	    }
-	
+	    //End updateHistory
 	    
 	    
 	    
@@ -136,7 +140,8 @@ public class Monitor extends Activity implements OnClickListener{
 		return cursor;
 
 	    }
-
+	    //End getHistory
+	    
 	    /**
 	     * Method called when the connection manager button is pressed.
 	     *<p>
@@ -150,14 +155,14 @@ public class Monitor extends Activity implements OnClickListener{
 	    @Override
 	    public void onClick(View v) {
 	    	try {
-	        	Log.v(TAG,"Connect Button Pressed");
+	        	Log.v(TAG,"A button was pressed. Locating button id.");
 	        	
 	        	//Look for v's id in the list of known buttons. Issue an error message if you can't find it.
 	        	switch (v.getId()) {
 	        	case R.id.connect_button:
 	        		Log.v(TAG,"Connect Button pressed. Calling DeviceListActivity.java");
 	        		Intent i = new Intent(this, DeviceListActivity.class);
-	        		startActivity(i);
+	        		startActivityForResult(i, DEVICE_LIST_ACTIVITY_ID);
 	        		break;
 	        	default:
 	        		Log.e(TAG,"No button found with " + v.getId());
@@ -170,5 +175,54 @@ public class Monitor extends Activity implements OnClickListener{
 	    		Log.e(TAG,"There was an exception with the onClick function: " + e.getMessage(),e.getCause());
 	    	}
 	    	//End try/catch
-	    }	    
+	    }
+	    //End onClick
+	    
+	    /**
+	     * Method called when a child activity is called. 
+	     * <p>
+	     * Most notably this function is called when the DeviceListActivity pairs a device.
+	     * 
+	     * @author Neale Petrillo
+	     * @version 1, 3/6/2011
+	     * 
+	     * @param requestCode The code with which the child activity finished.
+	     * @param resultCode
+	     * @param data The data from the child.
+	     * 
+	     * @see DeviceListActivity
+	     */
+	     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		 Log.v(TAG, "Recieved child activity result. Starting to parse results.");
+		 
+	         switch (requestCode) {
+	         case DEVICE_LIST_ACTIVITY_ID:
+	            Log.v(TAG, "Results orriginated form DeviceListActivity. Processing results.");
+	            if(resultCode == RESULT_OK){
+	        	Log.v(TAG, "The results are ok. Continuing processing.");
+	        	//Try to build the device to connect with
+	                // Get the device MAC address
+	                String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+	                // Get the BluetoothDevice object
+	                BluetoothDevice foreignDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
+	                Log.v(TAG, "Trying to connect to the newly built device.");
+	                //Pass the new device to the connect function
+	                device.connect(foreignDevice);
+	        	
+	            }
+	            else {
+	        	Log.e(TAG, "There was an error when returning the result set. There should probably be some kind of error management here.");
+	            }
+	            //End if/else
+	            
+	            
+	            break;
+	            
+	         default:
+	             Log.e(TAG, "Unable to find correstponding child activity. Killing process.");
+	             break;
+	         }
+	         //End switch
+	     }
+	     //End onActivityResult
 }
