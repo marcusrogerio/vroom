@@ -8,6 +8,7 @@
 			android:title="@string/device_settings_label"
 			android:alphabeticShortcut="@string/device_settings_label"></item>
 			
+			
 </menu>
     
     

@@ -12,6 +12,7 @@ import static com.vroom.Constants.DEVICE_LIST_ACTIVITY_ID;
 
 import com.vroom.BluetoothHelper;
 import com.vroom.BluetoothHandler;
+import com.vroom.BluetoothHelper.State;
 
 import com.vroom.DatabaseHelper;
 import android.app.Activity;
@@ -22,22 +23,27 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class Monitor extends Activity implements OnClickListener{
+public class Monitor extends Activity {
 
     private final String TAG = "Monitor";
     private DatabaseHelper history;
-    private BluetoothHandler handler;
     private BluetoothHelper device;
     /**
      * onCreate is called when the class is first created.
      * It sets the content view, prepares the database, builds the bluetooth helper, and sets up graphing. 
      * 
      * @author Neale Petrillo
-     * @version 1, 3/3/2011
+     * @version 2, 3/3/2011
      * 
      * @see DatabaseHelper
      * @see Monitor
@@ -54,12 +60,8 @@ public class Monitor extends Activity implements OnClickListener{
 		
 		//Setup local variables
 		history = new DatabaseHelper(this);
-		handler = new BluetoothHandler();
 		device = new BluetoothHelper(this, handler);
 		
-		//Set onClickListener for connect button
-                View connectButton = findViewById(R.id.connect_button);
-                connectButton.setOnClickListener(this);
 	
 	}
 	//End onCreate
@@ -143,42 +145,6 @@ public class Monitor extends Activity implements OnClickListener{
 	    //End getHistory
 	    
 	    /**
-	     * Method called when the connection manager button is pressed.
-	     *<p>
-	     *Starts the DeviceListActivity activity and begins the process of connecting to a Bluetooth device. 
-	     *
-	     *@author Neale Petrillo
-	     *@version 1
-	     *
-	     *@param view The View that has been clicked.
-	     */
-	    @Override
-	    public void onClick(View v) {
-	    	try {
-	        	Log.v(TAG,"A button was pressed. Locating button id.");
-	        	
-	        	//Look for v's id in the list of known buttons. Issue an error message if you can't find it.
-	        	switch (v.getId()) {
-	        	case R.id.connect_button:
-	        		Log.v(TAG,"Connect Button pressed. Calling DeviceListActivity.java");
-	        		Intent i = new Intent(this, DeviceListActivity.class);
-	        		startActivityForResult(i, DEVICE_LIST_ACTIVITY_ID);
-	        		break;
-	        	default:
-	        		Log.e(TAG,"No button found with " + v.getId());
-	        	
-	        	}
-	        	//End Switch
-	    		
-	    	}
-	    	catch (Exception e){
-	    		Log.e(TAG,"There was an exception with the onClick function: " + e.getMessage(),e.getCause());
-	    	}
-	    	//End try/catch
-	    }
-	    //End onClick
-	    
-	    /**
 	     * Method called when a child activity is called. 
 	     * <p>
 	     * Most notably this function is called when the DeviceListActivity pairs a device.
@@ -208,7 +174,21 @@ public class Monitor extends Activity implements OnClickListener{
 	                Log.v(TAG, "Trying to connect to the newly built device.");
 	                //Pass the new device to the connect function
 	                device.connect(foreignDevice);
-	        	
+	                
+	        	//Hide the connect button if the device is connected
+	                if(device.getState() == State.CONNECTED || device.getState() == State.CONNECTING){
+	                    Log.d(TAG, "Connected to device.");	               
+
+	                    
+                    
+	                }
+	                else {
+	                    Toast toast = Toast.makeText(this, "Unable to connect to device "+device.toString()+"\n Try reconnecting.", Toast.LENGTH_LONG);
+	                    toast.show();
+	                }
+	                //End if/else
+
+	                
 	            }
 	            else {
 	        	Log.e(TAG, "There was an error when returning the result set. There should probably be some kind of error management here.");
@@ -225,4 +205,181 @@ public class Monitor extends Activity implements OnClickListener{
 	         //End switch
 	     }
 	     //End onActivityResult
-}
+	     
+		/**
+		 * Method called to create options menu
+		 * <p>
+		 * onCreateOptionsMenu when the user presses the menu button. It inflates the menu/settings.xml file. 
+		 * 
+		 *  @author Neale Petrillo
+		 *  @version 1
+		 * 	@see Vroom
+		 * 	@see menu/settings.xml
+		 * 
+		 * 	@param menu The menu to inflate, type Menu
+		 * 	@return true if menu is inflated otherwise returns false on error
+		 * 	@throws none
+		 * 
+		 **/
+	    @Override
+	    public boolean onCreateOptionsMenu(Menu menu) {
+	    	//Start try/catch
+	    	try {
+	        	super.onCreateOptionsMenu(menu);
+	        	MenuInflater inflater = getMenuInflater();
+	        	inflater.inflate(R.menu.menu, menu);
+	        	
+	        	if(device.getState() == State.CONNECTED || device.getState() == State.CONNECTING){
+	        	    //Set the connect button invisible and the disconnect button visible
+		    		menu.findItem(R.id.connect_device).setVisible(false);
+		    		menu.findItem(R.id.disconnect_device).setVisible(true);
+	        	}
+	        	else{
+		    		//Hide the disconnect button and show the connect button
+		    		menu.findItem(R.id.connect_device).setVisible(true);
+		    		menu.findItem(R.id.disconnect_device).setVisible(false);
+	        	}
+	        	//End if/else
+	        	return true;
+	    	}
+	    	catch (Exception e){
+	    		Log.e(TAG, "Error occured when creating options menu: " + e.getMessage(), e.getCause());
+	    		return false;
+	    	}
+	    	//End try/catch
+	    }
+	    //End onCreateOptionsMenu
+	    
+	    /**
+	     * Method called after the menu is first created. Updates the menu according to the state of the device.
+	     * 
+	     * @author Neale Petrillo
+	     * @version 1, 3/9/2011
+	     */
+	    @Override
+	    public boolean onPrepareOptionsMenu(Menu menu){
+	    	try {
+	    	    
+	    	    if(device.getState() == State.CONNECTED || device.getState() == State.CONNECTING){
+	    		//Hide the connect button and show the disconnect button
+	    		menu.findItem(R.id.connect_device).setVisible(false);
+	    		menu.findItem(R.id.disconnect_device).setVisible(true);
+	    		return true;
+	    	    }
+	    	    else{
+	    		//Hide the disconnect button and show the connect button
+	    		menu.findItem(R.id.connect_device).setVisible(true);
+	    		menu.findItem(R.id.disconnect_device).setVisible(false);
+	    		return true;
+	    	    }
+	    	    
+	    	}
+	    	catch (Exception e){
+	    		Log.e(TAG, "Error occured when creating options menu: " + e.getMessage(), e.getCause());
+	    		return false;
+	    	}
+	    	//End try/catch		
+	    }//End onPrepareOptionsMenu
+		/**
+		 * Method called when options menu item is selected
+		 * <p>
+		 * onOptionsItemSelected takes a menu item and does the appropriate action based on the selection. Selections
+		 * are based on the items listed in menu/settings.xml 
+		 * 
+		 *  @author Neale Petrillo
+		 *  @version 1
+		 * 	@see Vroom
+		 * 	@see menu/settings.xml
+		 * 
+		 * 	@param item The item selected, type MenuItem
+		 * 	@return true if activity is in the list otherwise returns false
+		 * 	@throws none
+		 * 
+		 **/
+	    //Start onOptionsItemSelected
+	    @Override
+	    public boolean onOptionsItemSelected(MenuItem item) {
+	    	try {
+	    	  	switch (item.getItemId()) {
+	        	case R.id.personal_settings:
+	        		startActivity(new Intent(this, PersonalSettings.class));
+	        		return true;
+	        		
+	        	case R.id.device_settings:
+	    			startActivity(new Intent(this, DeviceSettings.class));
+	    			return true;
+	        	
+	        	case R.id.connect_device:
+	        		Log.v(TAG,"Connect Button pressed. Calling DeviceListActivity.java");
+	        		Intent i = new Intent(this, DeviceListActivity.class);
+	        		startActivityForResult(i, DEVICE_LIST_ACTIVITY_ID);
+	        		return true;
+	        		
+	        	case R.id.disconnect_device:
+	        	    	device.stop();
+	        	    	return true;
+	        	default:
+	        		Log.v(TAG, "Menu item selected was not found in the onOptionsItemsSelected method. Returning false");
+	        		return false;
+	        	}
+	    	}
+	    	catch (Exception e){
+	    		Log.e(TAG,"Error when selecting menu item: " + e.getMessage(), e.getCause());
+	    		return false;
+	    	}
+	  
+	    }
+	    //End onOptionsItemSelected
+	    
+	    /**
+	     * The handler that gets information back from the BluetoothHandler
+	     */
+	    private final BluetoothHandler handler = new BluetoothHandler() {
+	        @Override
+	        public void handleMessage(Message msg) {
+	            
+	            try{
+	        	//Get the message type
+	        	int messageType = msg.what;
+	        	//Get the view to update
+	        	TextView messageView = (TextView)findViewById(R.id.monitor_update);
+	        	
+	        	//Find the type of message it is
+	        	if(messageType == BluetoothHandler.MessageType.STATE.ordinal()){   
+	        	    String txt = msg.obj.toString();	
+	        	    messageView.append("Changing state to: " + txt + "\n");
+	        	    
+	        	}else if (messageType == BluetoothHandler.MessageType.DEVICE.ordinal()){
+	        	  
+	        	    String txt = msg.obj.toString();
+	        	    messageView.append("Connected to "+txt+"\n");
+	        	    
+	        	}else if (messageType == BluetoothHandler.MessageType.NOTIFY.ordinal()){
+	        	    
+	        	    String txt = msg.obj.toString();
+	        	    messageView.append(txt+"\n");
+	        	    
+	        	}else if (messageType == BluetoothHandler.MessageType.READ.ordinal()){
+	       
+	                    byte[] readBuf = (byte[]) msg.obj;
+	                    // Construct a string from the valid bytes in the buffer
+	                    String readMessage = new String(readBuf, 0, msg.arg1);
+	                    messageView.append(readMessage+"\n");
+	        	    
+	        	}else if (messageType == BluetoothHandler.MessageType.WRITE.ordinal()){
+	        	    
+	        	}else {
+	        	    Log.e(TAG, "Unknown message type recieved.");
+	        	}//End if/else
+	            }
+	            catch (Exception e){
+	        	Log.e(TAG, "Error managing returned message in handleMessage. "+e.getMessage(), e.getCause());
+	            }//End try/catch
+
+	            
+	            
+	            
+	        }//End handleMessage
+	    };//End BluetoothHandler
+	    
+}//End Monitor

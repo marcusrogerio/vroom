@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item	android:id="@+id/connect_device"
+			android:title="@string/connect_device_settings_label"
+			android:alphabeticShortcut="@string/connect_device_settings_shortcut"></item>
+			
+	<item	android:id="@+id/disconnect_device"
+			android:title="@string/disconnect_device_settings_label"
+			android:alphabeticShortcut="@string/disconnect_device_settings_shortcut"></item>
+			
+	<item 	android:id="@+id/personal_settings"
+			android:title="@string/personal_settings_label"
+			android:alphabeticShortcut="@string/personal_settings_label"></item>
+			
+	<item 	android:id="@+id/device_settings"
+			android:title="@string/device_settings_label"
+			android:alphabeticShortcut="@string/device_settings_label"></item>
+			
+</menu>

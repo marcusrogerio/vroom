@@ -10,7 +10,7 @@
 	    <!-- Start Settings Information -->
 	    <string name="personal_settings_title">Personal Settings</string>
 	    <string name="personal_settings_label">Personal Settings</string>
-	    <string name="personal_settings_shortcut">s</string>
+	    <string name="personal_settings_shortcut">p</string>
 	    <string name="personal_settings_key_title">Vroom.com Access Key</string>
 	    <string name="personal_settings_key_description">Your automatically generated access key for Vroom.com</string>
 	    
@@ -22,6 +22,14 @@
 	    <string name="device_settings_connect_title">Connect At Startup?</string>
 	    <string name="device_settings_connect_description">Would you like to attempt to connect to this device when Vroom starts?</string>
 	    <!-- End Settings Menu Information -->
+	    
+	    <!-- Start Special Settings Menu Information -->
+	    <string name="connect_device_settings_label">Connect to Device</string>
+	    <string name="connect_device_settings_shortcut">c</string>
+	    
+	    <string name="disconnect_device_settings_label">Disconnect from Device</string>
+	    <string name="disconnect_device_settings_shortcut">s</string>
+	    <!-- End Special Settings Menu Information -->
     
     <!-- CLASS INFORMATION -->
     
