@@ -6,15 +6,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-import com.vroom.R;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 
 /**
@@ -129,6 +126,7 @@ public class BluetoothHelper {
     public synchronized void connect(BluetoothDevice device){
 	if(D) Log.d(TAG, "Starting connect().");
 	Log.v(TAG,"Attempting to connect to a device. " + device.toString());
+	
 	
 	//Cancel any thread attempting to make a connection
 	if(mState == State.CONNECTING){
@@ -377,13 +375,9 @@ public class BluetoothHelper {
 	    
 	    //Get a BluetoothSocket for a connection with the given BluetoothDevice
 	    try {
-		//temp = device.createRfcommSocketToServiceRecord(SPP_UUID);
 		Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
 	        temp = (BluetoothSocket) m.invoke(device, 1);
 	    }
-	    /*catch (IOException e){
-		Log.e(TAG, "Failed to create connected thread. "+e.getMessage(), e.getCause());
-	    }*/
 	    catch (Exception e) {
 		Log.e(TAG, "Failed to create connected thread. "+e.getMessage(), e.getCause());
 	    }
@@ -406,7 +400,7 @@ public class BluetoothHelper {
 	    }
 	    catch(IOException e){
 		Log.e(TAG, "Unable to connect. "+e.getMessage(), e.getCause());
-		//Pass message to monitor class!
+		mHandler.obtainMessage(BluetoothHandler.MessageType.NOTIFY, -1, "Error running the connect thread.");
 		
 		try{
 		    mmSocket.close();
@@ -494,7 +488,7 @@ public class BluetoothHelper {
 		}
 		catch (IOException e){
 		    Log.e(TAG, "Disconnected. "+e.getMessage(), e.getCause());
-		    //Send error message to UI
+		    mHandler.obtainMessage(BluetoothHandler.MessageType.NOTIFY, -1, "Error running the connected thread.");
 		    break;
 		}
 		//End try/catch

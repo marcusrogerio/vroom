@@ -9,6 +9,7 @@ import static com.vroom.Constants.troubleCode;
 import static com.vroom.Constants.voltage;
 import static com.vroom.Constants.timestamp;
 import static com.vroom.Constants.DEVICE_LIST_ACTIVITY_ID;
+import static com.vroom.DeviceSettings.OPT_MAC_DEF;
 
 import com.vroom.BluetoothHelper;
 import com.vroom.BluetoothHandler;
@@ -23,21 +24,70 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class Monitor extends Activity {
 
+    //Debug information
     private final String TAG = "Monitor";
+    
+    /**
+     * The database helper controls the connection between monitor and the database.
+     */
     private DatabaseHelper history;
+    /**
+     * Bluetooth helper controls the Bluetooth communication
+     */
     private BluetoothHelper device;
+    
+    /**
+     * A string used to store output buffer.
+     */
+    private String outPutString;
+    
+    /**
+     * Array adapter to push the outPutString
+     */
+    private ArrayAdapter<String> mConversationArrayAdapter;
+    
+    /**
+     * View associated with he output
+     */
+    private ListView mConversationView;
+    
+    /**
+     * List of control commands to send to the device.
+     */
+    private String controlCommands[] = {"@1","@2","E1","S0"};
+    
+    /** 
+     * List of OBD commands to send to the device.
+     * <p>
+     * Paired with obdTitles for easier processing. The order of the commands must match.
+     */
+    private String obdCommands[] = {"0105", "010C" };
+    
+    /**
+     * List of OBD titles for commands.
+     * <p>
+     * Paired with obdCommands for easier processing. The order of the commands must match.
+     */
+    private enum obdTitles {
+	TEMPERATURE, 
+	RPM;
+    }
+    
+    private int oControlNumber = -1;
+    
+    private int runNumber;
+    private String vehicleSerial;
+    
     /**
      * onCreate is called when the class is first created.
      * It sets the content view, prepares the database, builds the bluetooth helper, and sets up graphing. 
@@ -58,17 +108,24 @@ public class Monitor extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.monitor);
 		
+	        // Initialize the array adapter for the conversation thread
+	        mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
+	        mConversationView = (ListView) findViewById(R.id.monitor_update);
+	        mConversationView.setAdapter(mConversationArrayAdapter);
+		
 		//Setup local variables
 		history = new DatabaseHelper(this);
 		device = new BluetoothHelper(this, handler);
-		
+		outPutString = "";
+		runNumber = 0;
+		vehicleSerial="";
 	
 	}
 	//End onCreate
 
 	    /**
 	     * UpdateHistory updates one row of the history table. 
-	     * 
+	     * <p>
 	     * The UpdateHistory function is designed to take any number of arguments and update a history row as needed. 
 	     * Any passed values that are not in use must be given a null value. The timestamp column is omitted because
 	     * SQLite automatically updates it.
@@ -76,7 +133,6 @@ public class Monitor extends Activity {
 	     * @author Neale Petrillo
 	     * @version 1, 2/21/2011
 	     * 
-	     * @param db The SQLite database we're working with. Type SQLiteDatabase
 	     * @param vehicleId The id of the current vehicle. Type String
 	     * @param tempe The coolant temperature to be added to the vehicle history. Type int
 	     * @param revs The current RPM to be added to the vehicle history. Type int
@@ -117,7 +173,46 @@ public class Monitor extends Activity {
 	    }
 	    //End updateHistory
 	    
+	    private void updateRPM(String vehicleId, int revs){
+		//Get the writable database
+		Log.v(TAG, "Getting writeable database");
+		SQLiteDatabase db = history.getWritableDatabase();
+		
+		try{
+		    ContentValues values = new ContentValues();
+		    values.put(historyId, vehicleId);
+		    values.put(rpm, revs);
+		    db.insertOrThrow(TABLE_USERHISTORY, null, values);
+		    db.close();			    
+		}
+		catch (Exception e){
+		    Log.e(TAG, "Unable to update history via updateHistory. "+e.getMessage(), e.getCause());
+		}
+		finally {
+		    db.close();
+		}
+	    }//End updateRPM
 	    
+	    private void updateTEMP(String vehicleId, int tempe){
+		//Get the writable database
+		Log.v(TAG, "Getting writeable database");
+		SQLiteDatabase db = history.getWritableDatabase();
+		
+		try {
+		    ContentValues values = new ContentValues();
+		    values.put(historyId, vehicleId);
+		    values.put(temperature, tempe);
+		    db.insertOrThrow(TABLE_USERHISTORY, null, values);
+		    db.close();			    
+		}
+		catch (Exception e) {
+		    Log.e(TAG, "Unable to update history via updateHistory. "+e.getMessage(), e.getCause());
+		    
+		}
+		finally {
+		    db.close();
+		}
+	    }//End updateTEMP
 	    
 	    /**
 	     * getHistory retrieves the entire history stored in memory.
@@ -145,7 +240,7 @@ public class Monitor extends Activity {
 	    //End getHistory
 	    
 	    /**
-	     * Method called when a child activity is called. 
+	     * Method called when a child activity returns. 
 	     * <p>
 	     * Most notably this function is called when the DeviceListActivity pairs a device.
 	     * 
@@ -169,33 +264,20 @@ public class Monitor extends Activity {
 	        	//Try to build the device to connect with
 	                // Get the device MAC address
 	                String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+	                
+	                //Store the address in the settings
+	                getPreferences(MODE_PRIVATE).edit().putString(OPT_MAC_DEF, address).commit();
+	                
 	                // Get the BluetoothDevice object
 	                BluetoothDevice foreignDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
 	                Log.v(TAG, "Trying to connect to the newly built device.");
 	                //Pass the new device to the connect function
 	                device.connect(foreignDevice);
-	                
-	        	//Hide the connect button if the device is connected
-	                if(device.getState() == State.CONNECTED || device.getState() == State.CONNECTING){
-	                    Log.d(TAG, "Connected to device.");	               
-
-	                    
-                    
-	                }
-	                else {
-	                    Toast toast = Toast.makeText(this, "Unable to connect to device "+device.toString()+"\n Try reconnecting.", Toast.LENGTH_LONG);
-	                    toast.show();
-	                }
-	                //End if/else
-
-	                
 	            }
 	            else {
 	        	Log.e(TAG, "There was an error when returning the result set. There should probably be some kind of error management here.");
 	            }
 	            //End if/else
-	            
-	            
 	            break;
 	            
 	         default:
@@ -207,7 +289,7 @@ public class Monitor extends Activity {
 	     //End onActivityResult
 	     
 		/**
-		 * Method called to create options menu
+		 * Method called to create the options menu
 		 * <p>
 		 * onCreateOptionsMenu when the user presses the menu button. It inflates the menu/settings.xml file. 
 		 * 
@@ -251,7 +333,10 @@ public class Monitor extends Activity {
 	    //End onCreateOptionsMenu
 	    
 	    /**
-	     * Method called after the menu is first created. Updates the menu according to the state of the device.
+	     * Method called after the menu is first created. 
+	     * <p>
+	     * Updates the menu according to the state of the device. If a device is connected a disconnect button is displayed. 
+	     * If a device isn't connected a connect button is displayed.
 	     * 
 	     * @author Neale Petrillo
 	     * @version 1, 3/9/2011
@@ -272,6 +357,7 @@ public class Monitor extends Activity {
 	    		menu.findItem(R.id.disconnect_device).setVisible(false);
 	    		return true;
 	    	    }
+	    	    //End if/else
 	    	    
 	    	}
 	    	catch (Exception e){
@@ -280,6 +366,7 @@ public class Monitor extends Activity {
 	    	}
 	    	//End try/catch		
 	    }//End onPrepareOptionsMenu
+	    
 		/**
 		 * Method called when options menu item is selected
 		 * <p>
@@ -321,18 +408,23 @@ public class Monitor extends Activity {
 	        	default:
 	        		Log.v(TAG, "Menu item selected was not found in the onOptionsItemsSelected method. Returning false");
 	        		return false;
-	        	}
+	        	}//End switch
 	    	}
 	    	catch (Exception e){
 	    		Log.e(TAG,"Error when selecting menu item: " + e.getMessage(), e.getCause());
 	    		return false;
-	    	}
+	    	}//End try/catch
 	  
 	    }
 	    //End onOptionsItemSelected
 	    
 	    /**
-	     * The handler that gets information back from the BluetoothHandler
+	     * The handler that gets information back from the BluetoothHandler.
+	     * <p>
+	     * Determines message type then processes the results either through publishing a message or calling the process results function.
+	     * 
+	     * @author Neale Petrillo
+	     * @version 3, 3/13/2011
 	     */
 	    private final BluetoothHandler handler = new BluetoothHandler() {
 	        @Override
@@ -341,45 +433,215 @@ public class Monitor extends Activity {
 	            try{
 	        	//Get the message type
 	        	int messageType = msg.what;
-	        	//Get the view to update
-	        	TextView messageView = (TextView)findViewById(R.id.monitor_update);
 	        	
 	        	//Find the type of message it is
 	        	if(messageType == BluetoothHandler.MessageType.STATE.ordinal()){   
-	        	    String txt = msg.obj.toString();	
-	        	    messageView.append("Changing state to: " + txt + "\n");
+	        	    try{
+	        		String txt = msg.obj.toString();	
+		        	mConversationArrayAdapter.add("Changing state to: "+txt + "\n");
+	        	    }
+	        	    catch(Exception e){
+	        		Log.e(TAG, "Error notifying monitor UI. "+e.getMessage(), e.getCause());
+	        	    }
 	        	    
 	        	}else if (messageType == BluetoothHandler.MessageType.DEVICE.ordinal()){
 	        	  
-	        	    String txt = msg.obj.toString();
-	        	    messageView.append("Connected to "+txt+"\n");
+	        	    try{
+	        		String txt = msg.obj.toString();
+	        		mConversationArrayAdapter.add("Connected to "+txt + "\n");
+	        	    }
+	        	    catch(Exception e){
+	        		Log.e(TAG, "Exception running the device output. "+e.toString(), e.getCause());
+	        	    }
+	        	    //End try/catch
 	        	    
 	        	}else if (messageType == BluetoothHandler.MessageType.NOTIFY.ordinal()){
-	        	    
-	        	    String txt = msg.obj.toString();
-	        	    messageView.append(txt+"\n");
+	        	    try{
+	        		String txt = msg.obj.toString();
+		        	mConversationArrayAdapter.add(txt + "\n");
+	        	    }
+	        	    catch(Exception e){
+	        		Log.e(TAG, "Exception while sending notify command. "+e.toString());
+	        	    }
+	        	    //End try/catch
 	        	    
 	        	}else if (messageType == BluetoothHandler.MessageType.READ.ordinal()){
-	       
-	                    byte[] readBuf = (byte[]) msg.obj;
-	                    // Construct a string from the valid bytes in the buffer
-	                    String readMessage = new String(readBuf, 0, msg.arg1);
-	                    messageView.append(readMessage+"\n");
+	        	    //-------------------------------------------------------------------------------------------------------------------- Read Message
+	        	    try{
+		                    byte[] readBuf = (byte[]) msg.obj;
+			               
+		                    // Construct a string from the valid bytes in the buffer
+		                    String readMessage = new String(readBuf, 0, msg.arg1);
+		                    
+		                    //Get the last character of the string received to save on processing.
+		                    char tmpChar = readMessage.charAt(readMessage.length() - 1);
+		                  
+		                    //If the last character in the string is a new line add the whole string to the view, otherwise add it to the string builder.
+		                    if(tmpChar == '\n' || tmpChar == '\r'){
+		                	mConversationArrayAdapter.add(outPutString + "\n");
+
+		                	//Handle the response
+		                	handleResponse(outPutString);
+		                	outPutString ="";
+		                
+		                    }
+		                    else {
+		                	outPutString = outPutString + readMessage;
+		                    }
+		                    //End if/else
+	        	    }
+	        	    catch (Exception e){
+	        		Log.e(TAG, "Error running the send/recieve routine. "+e.toString(),e.getCause());
+	        	    }
+	        	    //End try/catch
 	        	    
 	        	}else if (messageType == BluetoothHandler.MessageType.WRITE.ordinal()){
-	        	    
+	        	  //-------------------------------------------------------------------------------------------------------------------- Write Message
+	        	    try{
+	        		
+	        	    }
+	        	    catch (Exception e){
+	        		Log.e(TAG, "Error running the output routine. "+e.toString(),e.getCause());
+	        	    }
+	        	    //End try/catch
 	        	}else {
 	        	    Log.e(TAG, "Unknown message type recieved.");
 	        	}//End if/else
 	            }
 	            catch (Exception e){
-	        	Log.e(TAG, "Error managing returned message in handleMessage. "+e.getMessage(), e.getCause());
+	        	Log.e(TAG, "Error managing returned message in handleMessage. "+e.toString(), e.getCause());
 	            }//End try/catch
-
-	            
-	            
 	            
 	        }//End handleMessage
 	    };//End BluetoothHandler
 	    
+	    /**
+	     * Sends the at command corresponding with ordinal value i.
+	     * 
+	     * @author Neale Petrillo
+	     * @version 1, 3/10/2011
+	     * 
+	     * @param elmDevice The device to send the message to.
+	     * @param i The AT command to send
+	     */
+	    private void sendAtCommand(BluetoothHelper elmDevice, int i){
+		if(i < controlCommands.length && i >-1){
+		    try{
+			elmDevice.write(("AT"+controlCommands[i]).getBytes());
+		    }
+		    catch (Exception e){
+			Log.e(TAG, "Unable to setup adapter.");
+		    }
+		    //End try/catch
+		}
+		//End if		
+	    }
+	    //End sendAtCommand
+	    
+	    /**
+	     * Sends the OBDII command corresponding to the ordinal value i.
+	     * 
+	     * @author Neale Petrillo
+	     * @version 1, 3/10/2011
+	     * 
+	     * @param device The device to send the command to
+	     * @param i The ordinal value of the command to send
+	     */
+	    private void sendOBDCommand(BluetoothHelper elmDevice, int i){
+		try {
+			if(i < obdCommands.length){
+			    elmDevice.write(obdCommands[i].getBytes());    
+			}
+		}
+		catch (Exception e){
+		    Log.e(TAG, "Error sending OBD command. "+e.toString(), e.getCause());
+		}
+
+	    }//End sendOBDCommand
+	    
+	    /**
+	     * Handles a response from the device. 
+	     * <p>
+	     * Called by the handleMessage function whenever a newline character is detected (end of ELM device response). 
+	     * Checks response for completeness and updates the history. 
+	     * 
+	     * @author Neale Petrillo
+	     * @version 1, 3/13/2011
+	     * 
+	     * @param response Series of bytes received as an ELM response. 
+	     */
+	    private void handleResponse(String response){
+		try {
+		    Log.d(TAG, "Trying to handle ELM response");
+		    
+		    //Convert the response to a string of characters
+		    String stringedResponse = response.trim();
+		    
+		    /** 
+		     * The ELM chip will send a '>' when it is ready to receive. If this is the case then we can send the next OBD command or setup the device.
+		     * 
+		     * If we're just receiving a response then we need to process it. 
+		     * 
+		     * ELM OBD responses start with a 4. The next three bits identify the request that asked for the data. The rest of the bits are the requested data.
+		     */
+		    
+		    //Check to see if the first character is a control character. If it does then it's ok to send the next code.
+		    if(stringedResponse.startsWith(">")){
+			
+			//If it's the first run or all the ELM commands haven't been gone through we need to run them.
+			if(runNumber < controlCommands.length){
+			    sendAtCommand(device, runNumber);
+			    runNumber = runNumber + 1;
+			}
+			else if(runNumber == controlCommands.length){
+			    //Get the vehicle serial number
+			    device.write("09025".getBytes());
+			}
+			else {
+			    //Send the next code
+			    oControlNumber = (oControlNumber + 1) % obdCommands.length;
+			    sendOBDCommand(device, oControlNumber);			    
+			}//End if/else
+		    }
+		    else if(stringedResponse.startsWith("4")){
+			//Remove whitespace
+			stringedResponse.replaceAll(" ", "");
+			
+			String resultCode = stringedResponse.substring(1, 3);
+			resultCode = "0"+resultCode;
+			String resultData = stringedResponse.substring(4);
+			
+			//Determine the returned result
+			if (resultCode == "0902"){
+			    Log.d(TAG, "ELM response determined to be vehilce id. Converting and storing.");
+			    vehicleSerial = resultData;
+			    mConversationArrayAdapter.add("Vehicle ID: "+resultData);
+			}
+			else if(resultCode == obdCommands[obdTitles.RPM.ordinal()]){
+			    Log.d(TAG, "ELM response determined to be RPM. Converting and storing.");
+			    
+			    int rpm = Integer.parseInt(resultData, 16);
+			    rpm = rpm / 4;
+			    updateRPM(vehicleSerial, rpm);
+			    mConversationArrayAdapter.add("RPM: "+rpm);
+			}
+			else if(resultCode == obdCommands[obdTitles.TEMPERATURE.ordinal()]){
+			    Log.d(TAG, "ELM response determined to be temerpature. Converting and storing.");
+			    
+			    int tempe = Integer.parseInt(resultData, 16);
+			    tempe = tempe - 40;
+			    updateTEMP(vehicleSerial, tempe);
+			    mConversationArrayAdapter.add("TEMPERATURE: "+tempe);
+			    
+			}//End if/else
+		    }
+		    else{
+			mConversationArrayAdapter.add("Unknown Response recieved.");
+		    }//End if/else
+		}
+		catch (Exception e){
+		    Log.e(TAG, "Error while handling elm response. "+e.toString(), e.getCause());
+		    
+		}//End try/catch
+	    }//End handleResponse
 }//End Monitor

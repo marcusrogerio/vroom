@@ -39,7 +39,7 @@ public class DeviceSettings extends PreferenceActivity {
 	 * 
 	 * @see DeviceSettings
 	 */
-	private static final String OPT_MAC_DEF = "";
+	public static final String OPT_MAC_DEF = "";
 	
 	/**
 	 * OPT_CONNECT is the key for the device_connect settings in xml/device_settings.xml
