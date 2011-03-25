@@ -255,6 +255,7 @@ public class BluetoothHelper {
     /**
      * Sends an error message to the handler
      */
+    @SuppressWarnings("unused")
     private void sendErrorMessage(int messageId) {
 	setState(State.LISTEN);
 	mHandler.obtainMessage(BluetoothHandler.MessageType.NOTIFY, -1, mContext.getResources().getString(messageId)).sendToTarget();
@@ -271,6 +272,7 @@ public class BluetoothHelper {
 	//The local server socket
 	private final BluetoothServerSocket mmServerSocket;
 	
+	@SuppressWarnings("unused")
 	public AcceptThread() {
 	    if(D) Log.d(TAG, "Starting AcceptThread()");
 	    BluetoothServerSocket temp = null;
@@ -482,9 +484,10 @@ public class BluetoothHelper {
 		try {
 		    //Read from the InputStream
 		    bytes = mmInStream.read(buffer);
-		    
+
 		    //Send the obtained bytes to the UI Activity
 		    mHandler.obtainMessage(BluetoothHandler.MessageType.READ, bytes, buffer).sendToTarget();
+
 		}
 		catch (IOException e){
 		    Log.e(TAG, "Disconnected. "+e.getMessage(), e.getCause());
