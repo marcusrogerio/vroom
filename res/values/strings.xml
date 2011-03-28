@@ -21,6 +21,8 @@
 	    <string name="device_settings_mac_description">The mac address of your Bluetooth/OBD-II adapter.</string>
 	    <string name="device_settings_connect_title">Connect At Startup?</string>
 	    <string name="device_settings_connect_description">Would you like to attempt to connect to this device when Vroom starts?</string>
+	    <string name="device_settings_vehicle_id_description">The identifier for the current vehicle.</string>
+	    <string name="device_settings_vehicle_id_title">Vehicle ID</string>
 	    <!-- End Settings Menu Information -->
 	    
 	    <!-- Start Special Settings Menu Information -->

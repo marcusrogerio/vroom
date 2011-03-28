@@ -203,13 +203,18 @@ public class Monitor extends Activity {
 	     * getHistory retrieves the entire history stored in memory.
 	     * 
 	     * The returned cursor is ordered according to the recorded timestamp (most recent items first).
+	     * <p>
+	     * This function was depreciated in favor of at time processing for performance purposes. 
+	     * Future releases may use it to display vehicle performance histories. 
 	     * 
 	     * @author Neale Petrillo
 	     * @version 1, 2/23/2011
 	     * 
 	     * @param vehicleId The id of the vehicle to be looked up
 	     * @return A cursor with the database query results. There is no limit on the returned size.
+	     * @deprecated
 	     */
+	    @SuppressWarnings("unused")
 	    private Cursor getHistory(String vehicleId){
 		
 		final String[] FROM = {_ID, historyId, rpm, temperature, troubleCode, voltage,timestamp,};
@@ -577,8 +582,10 @@ public class Monitor extends Activity {
 		
 		//Stop the device to save battery power.
 		device.stop();
+
 		
 		//Save the current data
+		
 	    }//End onPause
 	    
 	    /**
