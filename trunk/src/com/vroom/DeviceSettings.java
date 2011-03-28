@@ -53,6 +53,9 @@ public class DeviceSettings extends PreferenceActivity {
 	 */
 	private static final boolean OPT_CONNECT_DEF = false;
 	
+	private static final String OPT_VEHILCEID = "vehicle_id";
+	private static final String OPT_VEHICLEID_DEF = "";
+	
 	/**
 	 * onCreate is called when the DeviceSettins button is clicked in the menu dialog. 
 	 * <p>
@@ -122,5 +125,16 @@ public class DeviceSettings extends PreferenceActivity {
 			Log.e(TAG, "Error while trying to see if the user wants to automatically connect. Exiting. "+e.getMessage(),e.getCause());
 			return false;
 		}
+	}
+	
+	public static String getVehicleId(Context context){
+	    try {
+		Log.v(TAG, "Trying to get the stored vehilce id");
+		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPT_VEHILCEID, OPT_VEHICLEID_DEF);
+	    }
+	    catch (Exception e){
+		Log.e(TAG, "Error while trying to return the vehicle id.");
+		return "";
+	    }
 	}
 }

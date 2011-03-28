@@ -29,9 +29,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.vroom.DeviceSettings;
+
 public class Repair extends Activity{
 	private static String TAG = "Repair";
 	private DatabaseHelper history;
+	private String codes[] = null;
 	
 	
 	@Override
@@ -41,10 +44,19 @@ public class Repair extends Activity{
 		
 		//Get the local database
 		history = new DatabaseHelper(this);
+		
+		//Get code
+		codes = getCodes(DeviceSettings.getVehicleId(this));
+		
+		//Get repair procedure
+		
+		//Display repair procedure
 	}
 	
 	/**
-	 * Sends a HTTP Get request to the server to lookup a given error code. 
+	 * Sends an HTTP Get request to the server to lookup a given error code.
+	 * <p>
+	 * This has been depreciated in favor of a simpler web view. Future releases may include the JSON functionality for better performance.  
 	 * 
 	 * @author Neale Petrillo
 	 * @version 1, 3/6/2011
@@ -55,8 +67,10 @@ public class Repair extends Activity{
 	 * @param year The year of the user's car
 	 * 
 	 * @return jArray A JSON array containing a list of possible solutions to the user's problem. 
+	 * @deprecated
 	 * 
 	 */
+	@SuppressWarnings("unused")
 	private JSONArray getSolution(String code, String make, String model, String year){
 	    Log.v(TAG, "Trying to get the solution to the specified error code.");
 	    
@@ -132,12 +146,13 @@ public class Repair extends Activity{
 	 * 
 	 * @param vehicleId The id of the current vehicle.  
 	 * 
-	 * @return code A string defining the latest error code in the database. 
+	 * @return code A string array defining the latest error codes in the database. 
 	 */
-	private String getCode(String vehicleId) {
+	@SuppressWarnings("null")
+	private String[] getCodes(String vehicleId) {
 	   Log.v(TAG, "Getting most recent error code.");
 	   SQLiteDatabase db = history.getReadableDatabase();
-	   String toReturn = "";
+	   String toReturn[] = null;
 	   
 	    try {
 		Log.v(TAG, "Trying to build the return info.");
@@ -148,7 +163,10 @@ public class Repair extends Activity{
 		//If there's something to return, return it.
 		if(cursor.getCount() > 0 ){
 		    cursor.moveToFirst();
-		    toReturn = cursor.getString(0);
+		    
+		    for(int i=0; i<cursor.getCount(); i++){
+			 toReturn[i] = cursor.getString(i);
+		    }
 		}
 		Log.v(TAG, "Returning results.");
 		//End if	

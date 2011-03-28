@@ -19,4 +19,9 @@
     					android:title="@string/device_settings_connect_title"
     					android:summary="@string/device_settings_connect_description"
     					android:defaultValue="true"></CheckBoxPreference>
+    					
+    <EditTextPreference	android:key="vehicle_id"
+    					android:title="@string/device_settings_vehicle_id_title"
+    					android:summary="@string/device_settings_vehicle_id_description"
+    					android:defaultValue=""></EditTextPreference>
 </PreferenceScreen>
