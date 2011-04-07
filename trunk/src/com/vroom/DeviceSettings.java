@@ -3,6 +3,7 @@ package com.vroom;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -137,4 +138,16 @@ public class DeviceSettings extends PreferenceActivity {
 		return "";
 	    }
 	}
-}
+	
+	public void setVehicleId(Context context, String id){
+	    try {
+		//Get preferences
+		SharedPreferences prefs = getSharedPreferences("device_settings", 0);
+		prefs.edit().putString(OPT_VEHILCEID, id).commit();
+		
+	    }
+	    catch (Exception e){
+		Log.e(TAG, "Error while trying to save vehicle id.");
+	    }
+	}
+}	

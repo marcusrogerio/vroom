@@ -28,31 +28,118 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.view.View.OnClickListener;
 
 import com.vroom.DeviceSettings;
 
-public class Repair extends Activity{
+public class Repair extends Activity implements OnClickListener{
 	private static String TAG = "Repair";
 	private DatabaseHelper history;
 	private String codes[] = null;
-	
+	private WebView webView;
+	private ListView updateList;
+	private ArrayAdapter<String> mConversationArrayAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.repair);
 		
+		//Get views
+		webView = (WebView) findViewById(R.id.repair_view);
+		updateList = (ListView) findViewById(R.id.repair_update);
+		mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
+		updateList.setAdapter(mConversationArrayAdapter);
+		
 		//Get the local database
 		history = new DatabaseHelper(this);
 		
 		//Get code
 		codes = getCodes(DeviceSettings.getVehicleId(this));
-		
-		//Get repair procedure
-		
-		//Display repair procedure
+		if(codes !=null && codes.length > 0){
+		    
+		    //Display a list of selectable codes for repair
+		    new AlertDialog.Builder(this).setTitle(R.string.repair_title).setItems(codes, new DialogInterface.OnClickListener(){public void onClick(DialogInterface dialoginterface, int i){getSolution(i);}}).show();
+		    
+		}
+		else {
+		    //Do not display the webview and set the status message
+		    webView.setVisibility(View.INVISIBLE);
+		    mConversationArrayAdapter.add("No codes to display");
+		}
 	}
+	private void getSolution(int i){
+	    
+	    //Update the logger
+	    mConversationArrayAdapter.add("Looking up code "+codes[i]);
+	    
+	    //Get the code from the web
+	    String url = getErrorInfoURL + "?make=honda&model=odyssey&year=1997&code=" + codes[i]; 
+	    webView.getSettings().setJavaScriptEnabled(false);
+	    webView.loadUrl(url);
+	    
+	}
+	/**
+	 * Retrieves the last error code from the local database. 
+	 * 
+	 * @author Neale Petrillo
+	 * @version 1, 3/6/2011
+	 * 
+	 * @param vehicleId The id of the current vehicle.  
+	 * 
+	 * @return code A string array defining the latest error codes in the database or null if there aren't any. 
+	 */
+	private String[] getCodes(String vehicleId) {
+	   Log.v(TAG, "Getting most recent error code.");
+	   SQLiteDatabase db = history.getReadableDatabase();
+	   String toReturn[] = {"","","",""};
+	   
+	   
+	    try {
+		Log.v(TAG, "Trying to build the return info.");
+		Cursor cursor = db.query(TABLE_USERHISTORY, new String[] {troubleCode}, historyId + " = " + vehicleId, null, null, null, timestamp + " DESC");
+		startManagingCursor(cursor);
+		
+		Log.v(TAG, "Parsing the reutnred contents.");
+		//If there's something to return, return it.
+		if(cursor.getCount() > 0 ){
+		    cursor.moveToFirst();
+		    int i = 0;
+		    while(cursor.moveToNext() && i < 4){
+			toReturn[i] = cursor.getString(0);
+			i = i +1;
+		    }
+		}
+		Log.v(TAG, "Returning results.");
+		//End if	
+		return toReturn;
+		
+	    }catch (Exception e){
+		Log.e(TAG, "Unable to get local history. Returning null. "+e.getMessage(), e.getCause());
+		return null;
+	    }
+	    //End try/catch
+	}
+	//End getCode
 	
+	@Override
+	public void onClick(View v){
+    		Log.v(TAG,"A button was clicked; looking for its id");
+	
+    		//Look for v's id in the list of known buttons. Issue an error message if you can't find it.
+    		switch (v.getId()) {
+		
+			default:
+			    Log.e(TAG,"No button found with " + v.getId());
+	}
+	//End Switch
+	}
 	/**
 	 * Sends an HTTP Get request to the server to lookup a given error code.
 	 * <p>
@@ -138,45 +225,5 @@ public class Repair extends Activity{
 	}
 	//End getSolution
 	
-	/**
-	 * Retrieves the last error code from the local database. 
-	 * 
-	 * @author Neale Petrillo
-	 * @version 1, 3/6/2011
-	 * 
-	 * @param vehicleId The id of the current vehicle.  
-	 * 
-	 * @return code A string array defining the latest error codes in the database. 
-	 */
-	@SuppressWarnings("null")
-	private String[] getCodes(String vehicleId) {
-	   Log.v(TAG, "Getting most recent error code.");
-	   SQLiteDatabase db = history.getReadableDatabase();
-	   String toReturn[] = null;
-	   
-	    try {
-		Log.v(TAG, "Trying to build the return info.");
-		Cursor cursor = db.query(TABLE_USERHISTORY, new String[] {troubleCode}, historyId + " = " + vehicleId, null, null, null, timestamp + " DESC");
-		startManagingCursor(cursor);
-		
-		Log.v(TAG, "Parsing the reutnred contents.");
-		//If there's something to return, return it.
-		if(cursor.getCount() > 0 ){
-		    cursor.moveToFirst();
-		    
-		    for(int i=0; i<cursor.getCount(); i++){
-			 toReturn[i] = cursor.getString(i);
-		    }
-		}
-		Log.v(TAG, "Returning results.");
-		//End if	
-		return toReturn;
-		
-	    }catch (Exception e){
-		Log.e(TAG, "Unable to get local history. Returning null. "+e.getMessage(), e.getCause());
-		return null;
-	    }
-	    //End try/catch
-	}
-	//End getCode
+
 }

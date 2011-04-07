@@ -14,6 +14,7 @@ import static com.vroom.DeviceSettings.OPT_MAC_DEF;
 import com.vroom.BluetoothHelper;
 import com.vroom.BluetoothHandler;
 import com.vroom.BluetoothHelper.State;
+import com.vroom.DeviceSettings;
 
 import com.vroom.DatabaseHelper;
 import android.app.Activity;
@@ -21,6 +22,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -88,6 +90,7 @@ public class Monitor extends Activity {
     private int oControlNumber = -1;
     private int runNumber;
     private String vehicleSerial;
+    private static final String OPT_VEHILCEID = "vehicle_id";
 
     
     /**
@@ -134,7 +137,10 @@ public class Monitor extends Activity {
 		outPutString = "";
 		runNumber = 0;
 		vehicleSerial="";
-	
+		
+		updateCode("123450", "123450");
+		vehicleSerial="123450";
+		
 	}
 	//End onCreate
 	    
@@ -501,6 +507,11 @@ public class Monitor extends Activity {
 			if (resultCode.equals("0902")){
 			    Log.d(TAG, "ELM response determined to be vehilce id. Converting and storing.");
 			    vehicleSerial = resultData;
+			    //Store the vehicle serial number in the device settings
+				//Get preferences
+				SharedPreferences prefs = getSharedPreferences("device_settings", 0);
+				prefs.edit().putString(OPT_VEHILCEID, vehicleSerial).commit();
+			    
 			    mConversationArrayAdapter.add("Vehicle ID: "+resultData);
 			}
 			else if(resultCode.equals(obdCommands[obdTitles.RPM.ordinal()])){
