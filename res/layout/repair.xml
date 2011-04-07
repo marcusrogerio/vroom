@@ -5,4 +5,7 @@
 			    android:layout_height="fill_parent"
 			    android:background="@color/background"
 			    android:padding="10dip">
+    	<ListView android:layout_width="fill_parent" android:transcriptMode="alwaysScroll" android:id="@+id/repair_update" android:layout_weight="0" android:layout_height="wrap_content" android:stackFromBottom="true"></ListView>
+	    <WebView android:id="@+id/repair_view" android:layout_width="fill_parent" android:layout_weight="1" android:layout_height="wrap_content"></WebView>
+			    		
 </LinearLayout>

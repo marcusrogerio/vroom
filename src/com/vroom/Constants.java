@@ -97,7 +97,7 @@ public interface Constants extends BaseColumns {
 //End userHistory table
 
 //Start external database information 
-	public static final String getErrorInfoURL = "http://eclipse.wells.edu/~npetrillo/thesis/returnErrors.php";
+	public static final String getErrorInfoURL = "http://eclipse.wells.edu/~npetrillo/thesis/getsolution.php";
 //End external database information
 	
 //Start activity list data
